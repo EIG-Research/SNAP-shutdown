@@ -137,6 +137,8 @@ snap_acs = get_acs(
 # Read in election results #
 ############################
 
+# note- these data are proprietary and not publically available.
+
 election_data = read_excel(file.path(data_path, "Election Master Dataset 2024_prelimV10.xlsx")) %>%
   mutate(`2024 margin` = 100*(`2024 Trump votes` - `2024 Harris votes`)/(`2024 Trump votes` + `2024 Harris votes`)) %>%
   select(`County ID`, `2024 margin`,
@@ -169,7 +171,7 @@ snap_master = transfers_at_risk %>%
   full_join(snap_by_county, by = c("GeoFIPS" = "county")) %>%
   full_join(snap_acs, by = c("GeoFIPS" = "GEOID")) %>%
   full_join(persistant_poverty, by = c("GeoFIPS" = "FIPS")) %>%
-  full_join(election_data, by = c("GeoFIPS" = "County ID")) %>%
+#  full_join(election_data, by = c("GeoFIPS" = "County ID")) %>%
   # add in population estimates, full coverage
   left_join(population, by = c("GeoFIPS" = "county")) %>%
   mutate(state = substr(GeoFIPS, 1, 2)) %>%
