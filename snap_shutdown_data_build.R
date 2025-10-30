@@ -153,8 +153,13 @@ persistant_poverty = read_excel(file.path(data_path, "Persistent Poverty Dataset
                                         sheet = "All counties") %>%
   mutate(FIPS = stringr::str_pad(FIPS, side = "left", pad = "0", width = 5)) %>%
   mutate(FIPS = ifelse(FIPS == "46102", "46113",FIPS)) %>%
-  select(FIPS, Typology)
-
+  select(FIPS, Typology) %>%
+  mutate(Typology = case_when(
+    Typology =="Urban-high white or AAPI share" ~ "Metropolitan disproportionately white",
+    Typology =="Urban-high Black share" ~ "Metropolitan disproportionately black",
+    Typology =="Urban-high Hispanic share" ~ "Metropolitan disproportionately hispanic",
+    TRUE ~ Typology
+  ))
 
 ####################
 # Combine all data #
@@ -173,6 +178,7 @@ snap_master = transfers_at_risk %>%
                          "86", "87", "88", "89", "90", "91", "92", "93", "94", "95", "96", "97", "98", "99", "U.")) %>%
   filter(!is.na(state)) %>%
   filter(!is.na(GeoName))
+  
 
 # Note: 
     # Connecticut boundaries for 2024 population are not handled.
@@ -244,12 +250,11 @@ table2 = snap_master %>%
 
 ################################################################################
 # Export 
-setwd(output_path)
 
-# total data
-write.csv(snap_master, "all_cleaned_data_snap.csv")
+# Constructed dataset
+write.csv(snap_master, file.path(output_path, "all_cleaned_data_snap.csv"))
 
 # tables
-write.csv(table, "topline_table_USDA.csv")
-write.csv(table2, "topline_table_ACS.csv")
-write.csv(reliant, "top15_reliant_inc.csv")
+write.csv(table, file.path(output_path, "tables","topline_table_USDA.csv"))
+write.csv(table2, file.path(output_path, "tables","topline_table_ACS.csv"))
+write.csv(reliant, file.path(output_path, "tables","top15_reliant_inc.csv"))
